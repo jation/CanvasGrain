@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>canvas 粒子</title>
+    <style>
+        *{margin:0;padding:0;}
+        canvas{display: inline-block}
+        .pannel{
+            padding:10px;
+            display: inline-block;
+            width:250px;
+            font-size:0.8em;
+        }
+        .pannel input[type="number"]{
+            width:5em;
+        }
+
+        .default-config-pannel{
+            display: inline-block;
+        }
+        .default-config-pannel button{
+            height:32px;
+            line-height: 32px;
+            margin-top:5px;
+            padding:0 1em;
+        }
+    </style>
+</head>
+<body>
+<canvas id="stage" width="1024" height="738"></canvas>
+<div class="pannel">
+    <h3>发射器参数配置（修改参数，然后点击画面，每点击一次画面，产生一个新的发射器）</h3>
+    <div class="row">粒子浓度:<input type="number" step="1"  value="100" id="maxAliveCount"/>（1~1000，最大粒子存活数量）</div>
+    <div class="row">粒子寿命:<input type="number" step="0.1"  value="2.5" id="grainLife"/>（0~5）</div>
+    <div class="row">粒子寿命波动范围:<input type="number" step="0.1"  value="1.5" id="grainLifeRange"/>（0~5）</div>
+
+    <div class="row">随机尺寸范围最小尺寸:<input type="number" step="1"  value="40" id="minSize"/>（1~100）</div>
+    <div class="row">随机尺寸范围最大尺寸:<input type="number" step="1"  value="60" id="maxSize"/>（1~100）</div>
+
+    <div class="row">粒子生成横向分布范围:<input type="number" step="1"  value="0" id="rangeX"/>（0~768）</div>
+    <div class="row">粒子生成纵向分布范围:<input type="number" step="1"  value="0" id="rangeY"/>（0~768）</div>
+    <div class="row">初始化速度vx:<input type="number" step="1"  value="0" id="initVx"/>（1~100）</div>
+    <div class="row">vx波动范围:<input type="number" step="1"  value="4" id="initVxRange"/>（1~100）</div>
+    <div class="row">初始化速度vy:<input type="number" step="1"  value="0" id="initVy"/>（1~100）</div>
+    <div class="row">vy波动范围:<input type="number" step="1"  value="4" id="initVyRange"/>（1~100）</div>
+    <div class="row">波动最小热力:<input type="number" step="0.01"  value="-0.15" id="minHeat"/>（-0.5~0.5）</div>
+    <div class="row">波动最大热力:<input type="number" step="0.01"  value="-0.1" id="maxHeat"/>（-0.5~0.5）</div>
+    <div class="row">波动最小风力:<input type="number" step="0.01"  value="-0.15" id="minWind"/>（-0.5~0.5）</div>
+    <div class="row">波动最大风力:<input type="number" step="0.01"  value="-0.1" id="maxWind"/>（-0.5~0.5）</div>
+    <div class="row">是否受到发射器体系风力影响:<input type="checkbox" checked id="ifByLaucherWind"/></div>
+    <div class="row">是否受到发射器体系热力影响:<input type="checkbox" checked id="ifByLaucherHeat"/></div>
+    <div class="row">是否受到世界重力影响:<input type="checkbox"  id="ifByWorldGravity"/></div>
+    <div class="row">是否受到世界风力影响:<input type="checkbox"  id="ifByWorldWind" /></div>
+    <div class="row">是否受到世界热力影响:<input type="checkbox"  id="ifByWorldHeat" /></div>
+    <div class="default-config-pannel">
+        <h3>推荐设置（选择设置，然后屏幕上点一下~）</h3>
+        <div class="row"><button id="btn_cfg1">下雪（推荐在画面靠上方点击）</button></div>
+        <div class="row"><button id="btn_cfg2">星光点点（推荐在画面中间区域点击）</button></div>
+        <div class="row"><button id="btn_cfg3">妖艳的鬼火（哪里不会点哪里）</button></div>
+    </div>
+</div>
+
+<script src="js/lib/jquery-1.11.3.min.js"></script>
+<script src="js/lib/seajs.2.1.1.min.js"></script>
+<script>
+    seajs.config({});
+    seajs.use("./js/main.js");
+</script>
+<script>
+    function setConfig(minSize,maxSize,rangeX,rangeY,vx,vy,vxRange,vyRange,
+                       iflw,iflh,ifww,ifwh,ifwg,
+                       maxHeat,minHeat,maxWind,minWind,maxAliveCount,grainLife,grainLifeRange){
+        $('#minSize').val(minSize);
+        $('#maxSize').val(maxSize);
+        $('#rangeX').val(rangeX);
+        $('#rangeY').val(rangeY);
+        $('#initVx').val(vx);
+        $('#initVy').val(vy);
+        $('#initVxRange').val(vxRange);
+        $('#initVyRange').val(vyRange);
+        $("#ifByLaucherWind").prop('checked',iflw);
+        $("#ifByLaucherHeat").prop('checked',iflh);
+        $("#ifByWorldWind").prop('checked',ifww);
+        $("#ifByWorldHeat").prop('checked',ifwh);
+        $("#ifByWorldGravity").prop('checked',ifwg);
+        $('#minHeat').val(minHeat);
+        $('#maxHeat').val(maxHeat);
+        $('#minWind').val(minWind);
+        $('#maxWind').val(maxWind);
+        $('#maxAliveCount').val(maxAliveCount);
+        $("#grainLife").val(grainLife);
+        $("#grainLifeRange").val(grainLifeRange);
+    }
+    $('#btn_cfg1').on('click',function(){
+        setConfig(16,16,800,0,0,0,5,5,false,false,true,true,true,0,0,0,0,400,3,1.5);
+    });
+    $('#btn_cfg2').on('click',function(){
+        setConfig(4,8,768,1024,0,0,0,0,false,false,false,false,false,0,0,0,0,1000,2.5,1.5);
+    });
+    $('#btn_cfg3').on('click',function(){
+        setConfig(40,60,15,0,0,0,0,0,true,true,false,false,true,1.21,1.17,0,0,100,2.5,1.5);
+    });
+</script>
+</body>
+</html>
